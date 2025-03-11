@@ -1,40 +1,33 @@
 pipeline {
     agent any
 
-    environment {
-        SRN = "PES2UG22CS653-1" 
-        BUILD_DIR = "build"
-    }
-
     stages {
         stage('Build') {
             steps {
-                sh '''
-                mkdir -p $BUILD_DIR
-                g++ -o $BUILD_DIR/${SRN}_exec 2.cpp
-                '''
+                script {
+                    sh 'g++ -o PES2UG22CS653-1 non.cpp' // Compile the .cpp file
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh '''
-                chmod +x $BUILD_DIR/${SRN}_exec
-                ./$BUILD_DIR/${SRN}_exec
-                '''
+                script {
+                    sh './PES2UG22CS653-1' // Run the compiled binary
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "Deploying ${SRN}_exec..."
+                echo 'Deploying application...'
             }
         }
     }
 
     post {
         failure {
-            echo "Pipeline failed!"
+            echo 'Pipeline Failed'
         }
     }
 }
