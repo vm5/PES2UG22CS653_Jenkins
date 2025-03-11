@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    environment {
+        SRN = "PES2UG22CS653-1" 
+        BUILD_DIR = "build"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh '''
+                mkdir -p $BUILD_DIR
+                g++ -o $BUILD_DIR/${SRN}_exec 2.cpp
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                chmod +x $BUILD_DIR/${SRN}_exec
+                ./$BUILD_DIR/${SRN}_exec
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying ${SRN}_exec..."
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo "Pipeline failed!"
+        }
+    }
+}
