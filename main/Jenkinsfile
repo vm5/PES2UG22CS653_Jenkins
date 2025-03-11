@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+
+    environment {
+        REPO_URL = 'https://github.com/your-username/your-repo.git'  // Replace with your GitHub repo
+        BUILD_DIR = 'build'
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: "${REPO_URL}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+                mkdir -p $BUILD_DIR
+                g++ -o $BUILD_DIR/hello_exec main/hello.cpp
+                '''
+            }
+        }
+
+        stage('Test & Run') {
+            steps {
+                sh '''
+                chmod +x $BUILD_DIR/hello_exec
+                ./$BUILD_DIR/hello_exec
+                '''
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '$BUILD_DIR/hello_exec', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build completed successfully!"
+        }
+        failure {
+            echo "Build failed!"
+        }
+    }
+}
